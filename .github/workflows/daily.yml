@@ -1,10 +1,21 @@
 name: daily-post
 on:
   schedule:
-    - cron: "0 8 * * *"
+    - cron: "0 7 * * *"
+    - cron: "0 10 * * *"
+    - cron: "0 13 * * *"
+    - cron: "0 16 * * *"
+    - cron: "0 19 * * *"
   workflow_dispatch:
+    inputs:
+      league:
+        description: "premier, laliga, tunisia, seriea or bundesliga"
+        default: "premier"
 permissions:
   contents: write
+concurrency:
+  group: daily-post
+  cancel-in-progress: false
 jobs:
   post:
     runs-on: ubuntu-latest
@@ -15,6 +26,8 @@ jobs:
       - run: pip install feedparser requests playwright && playwright install --with-deps chromium
       - run: python main.py
         env:
+          SCHEDULE: ${{ github.event.schedule }}
+          LEAGUE_INPUT: ${{ github.event.inputs.league }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
           FB_PAGE_TOKEN: ${{ secrets.FB_PAGE_TOKEN }}
